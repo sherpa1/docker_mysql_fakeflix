@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  db:
+    image: mariadb
+    env_file:
+      - .env
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/sql:/docker-entrypoint-initdb.d
+    ports:
+      - 3306:3306
+    networks:
+      - fakeflix
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-uroot",
+          "-p${MARIADB_ROOT_PASSWORD}"
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  adminer:
+    container_name: adminer
+    image: adminer
+    ports:
+      - 8181:8080
+    networks:
+      - fakeflix
+
+networks:
+  fakeflix:
+    driver: bridge
